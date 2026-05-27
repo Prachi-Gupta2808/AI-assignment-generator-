@@ -35,7 +35,7 @@ export const initWebSocket = (server: Server) => {
   console.log("WebSocket server started!");
 };
 
-export const notifyClient = (assignmentId: string, data: object) => {
+export const notifyClient = (assignmentId: string, data: any) => {
   clients.forEach((client) => {
     if (
       client.assignmentId === assignmentId &&
@@ -45,6 +45,7 @@ export const notifyClient = (assignmentId: string, data: object) => {
     }
   });
 
-  // Remove notified clients
-  clients = clients.filter((c) => c.assignmentId !== assignmentId);
+  if (data && (data.status === "completed" || data.status === "failed")) {
+    clients = clients.filter((c) => c.assignmentId !== assignmentId);
+  }
 };

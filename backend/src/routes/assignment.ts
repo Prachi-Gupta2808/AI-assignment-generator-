@@ -147,16 +147,13 @@ router.get("/:id/paper", async (req: Request, res: Response) => {
 // POST regenerate paper
 router.post("/:id/regenerate", async (req: Request, res: Response) => {
   try {
-    // Delete old paper
     await GeneratedPaper.findOneAndDelete({ assignmentId: req.params.id });
     await redisClient.del(`paper:${req.params.id}`);
 
-    // Reset status
     await Assignment.findByIdAndUpdate(req.params.id, {
       status: "pending",
     });
 
-    // Add back to queue
     await assignmentQueue.add("generate-paper", {
       assignmentId: req.params.id,
     });

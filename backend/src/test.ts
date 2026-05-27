@@ -1,3 +1,4 @@
+//just for testing llm api
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 dotenv.config();

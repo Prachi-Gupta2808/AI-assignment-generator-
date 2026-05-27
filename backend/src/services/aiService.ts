@@ -97,6 +97,7 @@ IMPORTANT: Respond with ONLY a valid JSON object. No extra text, no markdown, no
 
 Rules:
 - Group questions by type into sections (Section A, B, C etc.)
+- For Multiple Choice Questions (MCQs), the question "text" field MUST include the question itself followed by the four choices labeled (A), (B), (C), and (D) on separate lines (e.g. "What is the capital of France?\n(A) Paris\n(B) London\n(C) Rome\n(D) Berlin"). Ensure there are actual newlines inside the text string so they render on separate lines.
 - difficulty must be exactly "Easy", "Medium", or "Hard"
 - Each question must have a brief answer for the answer key
 - Make questions based on reference material if provided
