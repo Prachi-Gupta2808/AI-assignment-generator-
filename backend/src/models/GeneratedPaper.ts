@@ -5,6 +5,7 @@ export interface IQuestion {
   text: string;
   difficulty: "Easy" | "Medium" | "Hard";
   marks: number;
+  answer?: string;
 }
 
 export interface ISection {
@@ -19,6 +20,10 @@ export interface IGeneratedPaper extends Document {
   totalMarks: number;
   totalQuestions: number;
   subject: string;
+  schoolName: string;
+  className: string;
+  timeAllowed: string;
+  aiMessage: string;
   createdAt: Date;
 }
 
@@ -31,6 +36,7 @@ const QuestionSchema = new Schema({
     required: true,
   },
   marks: { type: Number, required: true },
+  answer: { type: String, default: "" },
 });
 
 const SectionSchema = new Schema({
@@ -49,6 +55,10 @@ const GeneratedPaperSchema = new Schema({
   totalMarks: { type: Number, required: true },
   totalQuestions: { type: Number, required: true },
   subject: { type: String, default: "General" },
+  schoolName: { type: String, default: "Delhi Public School" },
+  className: { type: String, default: "Class 10" },
+  timeAllowed: { type: String, default: "3 Hours" },
+  aiMessage: { type: String, default: "" },
   createdAt: { type: Date, default: Date.now },
 });
 

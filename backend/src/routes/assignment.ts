@@ -1,10 +1,35 @@
 import express, { Request, Response } from "express";
+import multer from "multer";
 import { assignmentQueue } from "../config/bullmq";
 import redisClient from "../config/redis";
 import Assignment from "../models/Assignment";
 import GeneratedPaper from "../models/GeneratedPaper";
+import { extractTextFromFile } from "../services/fileService";
 
 const router = express.Router();
+
+// Multer setup
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (req, file, cb) => {
+    const allowed = ["image/jpeg", "image/png", "application/pdf"];
+    if (allowed.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only JPEG, PNG, PDF files allowed"));
+    }
+  },
+});
 
 // GET all assignments
 router.get("/", async (req: Request, res: Response) => {
@@ -21,7 +46,7 @@ router.get("/:id", async (req: Request, res: Response) => {
   try {
     const assignment = await Assignment.findById(req.params.id);
     if (!assignment) {
-      res.status(404).json({ success: false, message: "Assignment not found" });
+      res.status(404).json({ success: false, message: "Not found" });
       return;
     }
     res.json({ success: true, data: assignment });
@@ -30,35 +55,49 @@ router.get("/:id", async (req: Request, res: Response) => {
   }
 });
 
-// POST create assignment
-router.post("/", async (req: Request, res: Response) => {
+// POST create assignment with optional file
+router.post("/", upload.single("file"), async (req: Request, res: Response) => {
   try {
     const { title, dueDate, questionTypes, additionalInstructions } = req.body;
 
-    // Validation
-    if (!title || !dueDate || !questionTypes || questionTypes.length === 0) {
+    if (!title || !dueDate || !questionTypes) {
       res
         .status(400)
         .json({ success: false, message: "Please fill all required fields" });
       return;
     }
 
-    // Create assignment
+    // Parse questionTypes if it's a string
+    const parsedQuestionTypes =
+      typeof questionTypes === "string"
+        ? JSON.parse(questionTypes)
+        : questionTypes;
+
+    // Extract text from file if uploaded
+    let extractedText = "";
+    if (req.file) {
+      extractedText = await extractTextFromFile(
+        req.file.path,
+        req.file.mimetype
+      );
+    }
+
     const assignment = await Assignment.create({
       title,
       dueDate,
-      questionTypes,
-      additionalInstructions,
+      questionTypes: parsedQuestionTypes,
+      additionalInstructions: additionalInstructions || "",
+      extractedText: extractedText || "",
       status: "pending",
-    });
+    } as any);
 
-    // Add to BullMQ queue
     await assignmentQueue.add("generate-paper", {
-      assignmentId: assignment._id.toString(),
+      assignmentId: assignment!._id.toString(),
     });
 
     res.status(201).json({ success: true, data: assignment });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
@@ -68,16 +107,16 @@ router.delete("/:id", async (req: Request, res: Response) => {
   try {
     await Assignment.findByIdAndDelete(req.params.id);
     await GeneratedPaper.findOneAndDelete({ assignmentId: req.params.id });
-    res.json({ success: true, message: "Assignment deleted" });
+    await redisClient.del(`paper:${req.params.id}`);
+    res.json({ success: true, message: "Deleted successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
-// GET generated paper by assignment id
+// GET generated paper
 router.get("/:id/paper", async (req: Request, res: Response) => {
   try {
-    // Check Redis cache first
     const cached = await redisClient.get(`paper:${req.params.id}`);
     if (cached) {
       res.json({ success: true, data: JSON.parse(cached), fromCache: true });
@@ -92,7 +131,6 @@ router.get("/:id/paper", async (req: Request, res: Response) => {
       return;
     }
 
-    // Cache it
     await redisClient.set(
       `paper:${req.params.id}`,
       JSON.stringify(paper),
@@ -101,6 +139,29 @@ router.get("/:id/paper", async (req: Request, res: Response) => {
     );
 
     res.json({ success: true, data: paper });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// POST regenerate paper
+router.post("/:id/regenerate", async (req: Request, res: Response) => {
+  try {
+    // Delete old paper
+    await GeneratedPaper.findOneAndDelete({ assignmentId: req.params.id });
+    await redisClient.del(`paper:${req.params.id}`);
+
+    // Reset status
+    await Assignment.findByIdAndUpdate(req.params.id, {
+      status: "pending",
+    });
+
+    // Add back to queue
+    await assignmentQueue.add("generate-paper", {
+      assignmentId: req.params.id,
+    });
+
+    res.json({ success: true, message: "Regeneration started!" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
   }

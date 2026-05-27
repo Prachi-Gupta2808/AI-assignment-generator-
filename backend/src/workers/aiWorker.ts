@@ -10,14 +10,12 @@ export const startWorker = () => {
     "assignment-generation",
     async (job: Job) => {
       const { assignmentId } = job.data;
-
       console.log(`Processing job for assignment: ${assignmentId}`);
 
       await Assignment.findByIdAndUpdate(assignmentId, {
         status: "processing",
       });
 
-      // Notify frontend - processing started
       notifyClient(assignmentId, {
         status: "processing",
         message: "Generating your question paper...",
@@ -29,7 +27,8 @@ export const startWorker = () => {
       const paper = await generateQuestionPaper(
         assignment.title,
         assignment.questionTypes,
-        assignment.additionalInstructions
+        assignment.additionalInstructions,
+        assignment.extractedText
       );
 
       const generatedPaper = await GeneratedPaper.create({
@@ -38,6 +37,10 @@ export const startWorker = () => {
         totalMarks: paper.totalMarks,
         totalQuestions: paper.totalQuestions,
         subject: paper.subject,
+        schoolName: paper.schoolName,
+        className: paper.className,
+        timeAllowed: paper.timeAllowed,
+        aiMessage: paper.aiMessage,
       });
 
       await redisClient.set(
@@ -51,7 +54,6 @@ export const startWorker = () => {
         status: "completed",
       });
 
-      // Notify frontend
       notifyClient(assignmentId, {
         status: "completed",
         message: "Question paper generated!",

@@ -8,6 +8,7 @@ export interface ParsedQuestion {
   text: string;
   difficulty: "Easy" | "Medium" | "Hard";
   marks: number;
+  answer?: string;
 }
 
 export interface ParsedSection {
@@ -18,16 +19,20 @@ export interface ParsedSection {
 
 export interface ParsedPaper {
   subject: string;
+  schoolName: string;
+  className: string;
+  timeAllowed: string;
+  aiMessage: string;
   sections: ParsedSection[];
   totalMarks: number;
   totalQuestions: number;
 }
 
-// Build structured prompt
 const buildPrompt = (
   questionTypes: IQuestionType[],
   additionalInstructions: string,
-  title: string
+  title: string,
+  extractedText?: string
 ): string => {
   const questionDetails = questionTypes
     .map(
@@ -45,9 +50,16 @@ const buildPrompt = (
     0
   );
 
-  return `You are an expert teacher creating a question paper. Generate a structured question paper based on the following requirements.
+  const referenceSection = extractedText
+    ? `Reference Material (generate questions based on this content):
+${extractedText}
 
-Assignment Title: ${title}
+`
+    : "";
+
+  return `You are an expert teacher creating a question paper.
+
+${referenceSection}Assignment Title: ${title}
 Total Questions: ${totalQuestions}
 Total Marks: ${totalMarks}
 
@@ -58,19 +70,23 @@ Additional Instructions: ${additionalInstructions || "None"}
 
 IMPORTANT: Respond with ONLY a valid JSON object. No extra text, no markdown, no backticks.
 
-The JSON must follow this exact structure:
 {
   "subject": "subject name based on title",
+  "schoolName": "Delhi Public School, Sector-4, Bokaro",
+  "className": "Class 10",
+  "timeAllowed": "3 Hours",
+  "aiMessage": "Here is your customized Question Paper for [subject]. All questions are based on the curriculum.",
   "sections": [
     {
       "title": "Section A",
-      "instruction": "Attempt all questions",
+      "instruction": "Attempt all questions. Each question carries X marks.",
       "questions": [
         {
           "questionNumber": 1,
           "text": "question text here",
           "difficulty": "Easy",
-          "marks": 2
+          "marks": 2,
+          "answer": "brief answer here"
         }
       ]
     }
@@ -81,13 +97,13 @@ The JSON must follow this exact structure:
 
 Rules:
 - Group questions by type into sections (Section A, B, C etc.)
-- Each section = one question type
 - difficulty must be exactly "Easy", "Medium", or "Hard"
-- Make questions relevant to the title/subject
+- Each question must have a brief answer for the answer key
+- Make questions based on reference material if provided
+- aiMessage should be a friendly note about the paper
 - Return ONLY the JSON, nothing else`;
 };
 
-// Parse and validate AI response
 const parseAIResponse = (rawResponse: string): ParsedPaper => {
   let cleaned = rawResponse.trim();
   cleaned = cleaned
@@ -103,21 +119,14 @@ const parseAIResponse = (rawResponse: string): ParsedPaper => {
   }
 
   cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
-
   const parsed = JSON.parse(cleaned) as ParsedPaper;
 
   if (!parsed.sections || !Array.isArray(parsed.sections)) {
-    throw new Error("Invalid paper structure - missing sections");
+    throw new Error("Invalid paper structure");
   }
 
-  parsed.sections.forEach((section, i) => {
-    if (!section.title || !section.questions) {
-      throw new Error(`Invalid section ${i + 1} structure`);
-    }
-    section.questions.forEach((q, j) => {
-      if (!q.text || !q.difficulty || !q.marks) {
-        throw new Error(`Invalid question ${j + 1} in section ${i + 1}`);
-      }
+  parsed.sections.forEach((section) => {
+    section.questions.forEach((q) => {
       if (!["Easy", "Medium", "Hard"].includes(q.difficulty)) {
         q.difficulty = "Medium";
       }
@@ -127,20 +136,21 @@ const parseAIResponse = (rawResponse: string): ParsedPaper => {
   return parsed;
 };
 
-// Main generate function
 export const generateQuestionPaper = async (
   title: string,
   questionTypes: IQuestionType[],
-  additionalInstructions: string
+  additionalInstructions: string,
+  extractedText?: string
 ): Promise<ParsedPaper> => {
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-  const prompt = buildPrompt(questionTypes, additionalInstructions, title);
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const prompt = buildPrompt(
+    questionTypes,
+    additionalInstructions,
+    title,
+    extractedText
+  );
 
   const result = await model.generateContent(prompt);
   const rawResponse = result.response.text();
-
-  const paper = parseAIResponse(rawResponse);
-
-  return paper;
+  return parseAIResponse(rawResponse);
 };

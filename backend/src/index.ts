@@ -19,6 +19,7 @@ app.use(express.json());
 
 connectDB();
 connectRedis();
+
 startWorker();
 
 app.use("/api/assignments", assignmentRoutes);
@@ -27,10 +28,8 @@ app.get("/", (req, res) => {
   res.send("VedaAI Backend Running!");
 });
 
-// Create HTTP server
 const server = http.createServer(app);
 
-// Init WebSocket
 initWebSocket(server);
 
 server.listen(PORT, () => {

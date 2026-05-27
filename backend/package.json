@@ -20,6 +20,8 @@
     "express": "^5.2.1",
     "ioredis": "^5.10.1",
     "mongoose": "^9.6.2",
+    "multer": "^2.1.1",
+    "pdf-parse": "^2.4.5",
     "ws": "^8.21.0"
   },
   "devDependencies": {
@@ -27,7 +29,9 @@
     "@types/express": "^5.0.6",
     "@types/ioredis": "^4.28.10",
     "@types/mongoose": "^5.11.96",
+    "@types/multer": "^2.1.0",
     "@types/node": "^25.9.1",
+    "@types/pdf-parse": "^1.1.5",
     "@types/ws": "^8.18.1",
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",

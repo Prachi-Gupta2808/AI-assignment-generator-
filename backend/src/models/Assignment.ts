@@ -11,6 +11,7 @@ export interface IAssignment extends Document {
   dueDate: Date;
   questionTypes: IQuestionType[];
   additionalInstructions: string;
+  extractedText?: string;
   fileUrl?: string;
   status: "pending" | "processing" | "completed" | "failed";
   createdAt: Date;
@@ -27,6 +28,7 @@ const AssignmentSchema = new Schema({
   dueDate: { type: Date, required: true },
   questionTypes: [QuestionTypeSchema],
   additionalInstructions: { type: String, default: "" },
+  extractedText: { type: String, default: "" },
   fileUrl: { type: String },
   status: {
     type: String,
