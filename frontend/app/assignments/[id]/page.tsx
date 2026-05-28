@@ -91,8 +91,9 @@ export default function AssignmentDetailPage({ params }: { params: Promise<{ id:
 
   const connectWebSocket = () => {
     const ws = new WebSocket(
-      process.env.NEXT_PUBLIC_WS_URL!
+      `${process.env.NEXT_PUBLIC_WS_URL}/ws`
     );
+      
     
     ws.onopen = () => {
       ws.send(JSON.stringify({ assignmentId: id }));
@@ -105,7 +106,6 @@ export default function AssignmentDetailPage({ params }: { params: Promise<{ id:
           setGenerationMessage(data.message || 'Generating your question paper...');
         } else if (data.status === 'completed') {
           ws.close();
-          // Reload paper data
           reloadPaper();
         } else if (data.status === 'failed') {
           ws.close();

@@ -9,7 +9,7 @@ interface Client {
 let clients: Client[] = [];
 
 export const initWebSocket = (server: Server) => {
-  const wss = new WebSocketServer({ server });
+  const wss = new WebSocketServer({ server, path: "/ws" });
 
   wss.on("connection", (ws: WebSocket) => {
     console.log("New WebSocket connection!");
@@ -29,6 +29,11 @@ export const initWebSocket = (server: Server) => {
     ws.on("close", () => {
       clients = clients.filter((c) => c.ws !== ws);
       console.log("Client disconnected");
+    });
+
+    ws.on("error", (err) => {
+      console.error("WebSocket error:", err);
+      clients = clients.filter((c) => c.ws !== ws);
     });
   });
 

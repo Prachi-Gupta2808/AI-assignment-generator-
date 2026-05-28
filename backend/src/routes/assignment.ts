@@ -114,6 +114,7 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
         req.file.mimetype
       );
     }
+    console.log("Creating Assignment");
 
     const assignment = await Assignment.create({
       title,
@@ -123,6 +124,8 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
       extractedText: extractedText || "",
       status: "pending",
     } as any);
+
+    console.log("Assignment : `{$assignment}`");
 
     await assignmentQueue.add("generate-paper", {
       assignmentId: assignment!._id.toString(),

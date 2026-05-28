@@ -13,27 +13,36 @@ import { startWorker } from "./workers/aiWorker";
 dotenv.config();
 
 const app = express();
-
 app.set("trust proxy", 1);
+
 const PORT = process.env.PORT || 5000;
+
+const ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+  "https://ai-assignment-generator-roan.vercel.app",
+];
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://ai-assignment-generator-roan.vercel.app",
-    ],
+    origin: (origin, callback) => {
+      if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn(`CORS blocked origin: ${origin}`);
+        callback(new Error(`CORS blocked: ${origin}`));
+      }
+    },
     credentials: true,
   })
 );
+
 app.use(express.json());
 
 connectDB();
 connectRedis();
-
 startWorker();
 
-// General rate limit - 100 requests per 15 minutes
+// General rate limit — 100 requests per 15 minutes
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -42,7 +51,7 @@ const generalLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Strict limit for AI (I have free tier :( - 10 per minute
+// Strict limit for AI — 10 per minute (free tier)
 const aiLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 10,
@@ -56,14 +65,31 @@ const aiLimiter = rateLimit({
 
 app.use("/api/", generalLimiter);
 app.use("/api/assignments", aiLimiter);
-
 app.use("/api/assignments", assignmentRoutes);
 
 app.get("/", (req, res) => {
   res.send("VedaAI Backend Running!");
 });
 
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ success: true, message: "Server is healthy!" });
+});
+
 const server = http.createServer(app);
+
+server.on("upgrade", (request, socket, head) => {
+  const origin = request.headers.origin;
+
+  if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+    console.warn(`WebSocket upgrade blocked for origin: ${origin}`);
+    socket.write("HTTP/1.1 403 Forbidden\r\n\r\n");
+    socket.destroy();
+    return;
+  }
+
+  console.log(`WebSocket upgrade allowed for origin: ${origin}`);
+});
 
 initWebSocket(server);
 

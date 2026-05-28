@@ -3,18 +3,23 @@ import IORedis from "ioredis";
 
 dotenv.config();
 
+const redisUrl = process.env.REDIS_URL;
+
+if (!redisUrl) {
+  throw new Error("REDIS_URL is not defined in environment variables");
+}
+
+const parsedUrl = new URL(redisUrl);
+
 export const connectionOptions = {
-  host: "freehand-mountain-collar-23803.db.redis.io",
-  port: 19419,
-  password: "Hl9dxq1qk43VCPccKPclh6iztBQJhhSF",
+  host: parsedUrl.hostname,
+  port: Number(parsedUrl.port),
+  password: parsedUrl.password,
   maxRetriesPerRequest: null,
 };
 
 const redisClient = new IORedis({
-  host: "freehand-mountain-collar-23803.db.redis.io",
-  port: 19419,
-  password: "Hl9dxq1qk43VCPccKPclh6iztBQJhhSF",
-  maxRetriesPerRequest: null,
+  ...connectionOptions,
   retryStrategy: (times) => {
     if (times > 3) return null;
     return Math.min(times * 200, 1000);
