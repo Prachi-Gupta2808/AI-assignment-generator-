@@ -1,6 +1,7 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import rateLimit from "express-rate-limit";
 import http from "http";
 import "./config/bullmq";
 import connectDB from "./config/db";
@@ -21,6 +22,30 @@ connectDB();
 connectRedis();
 
 startWorker();
+
+// General rate limit - 100 requests per 15 minutes
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { success: false, message: "Too many requests, please slow down!" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Strict limit for AI (I have free tier :( - 10 per minute
+const aiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: {
+    success: false,
+    message: "Too many AI generations, please wait a minute!",
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use("/api/", generalLimiter);
+app.use("/api/assignments", aiLimiter);
 
 app.use("/api/assignments", assignmentRoutes);
 
