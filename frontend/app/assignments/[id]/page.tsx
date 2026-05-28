@@ -90,10 +90,9 @@ export default function AssignmentDetailPage({ params }: { params: Promise<{ id:
   };
 
   const connectWebSocket = () => {
-    const wsHost = typeof window !== 'undefined' 
-      ? `ws://${window.location.hostname}:5000` 
-      : 'ws://localhost:5000';
-    const ws = new WebSocket(wsHost);
+    const ws = new WebSocket(
+      process.env.NEXT_PUBLIC_WS_URL!
+    );
     
     ws.onopen = () => {
       ws.send(JSON.stringify({ assignmentId: id }));
