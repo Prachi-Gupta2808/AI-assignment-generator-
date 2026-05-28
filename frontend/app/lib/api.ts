@@ -2,6 +2,7 @@ import axios from "axios";
 
 const API = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
+  timeout: 60000,
 });
 
 export const getAssignments = () => API.get("/assignments");

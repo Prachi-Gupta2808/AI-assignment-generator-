@@ -147,7 +147,7 @@ export default function CreateAssignmentPage() {
     try {
       setIsGenerating(true);
       setErrorMsg('');
-      setGenerationMessage('Creating assignment...');
+      setGenerationMessage('Connecting to server (may take ~30s on first load)...');
 
       const formData = new FormData();
       formData.append('title', title);
@@ -238,7 +238,7 @@ export default function CreateAssignmentPage() {
           } catch (err) {
             console.error('Polling check failed:', err);
           }
-        }, 2000);
+        }, 10000);
       } else {
         setIsGenerating(false);
         setErrorMsg('Failed to create assignment. Please try again.');
