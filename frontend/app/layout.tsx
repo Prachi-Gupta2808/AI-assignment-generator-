@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'VedaAI - Assignment Dashboard',
+  title: 'AI Assignment creator',
   description: 'Create and manage academic assignments with AI-assisted grading',
   icons: {
     icon: [
