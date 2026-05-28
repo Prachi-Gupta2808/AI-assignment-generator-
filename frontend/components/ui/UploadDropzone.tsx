@@ -1,8 +1,7 @@
-// components/ui/UploadDropzone.tsx
 'use client';
 
+import { File, Trash, UploadCloud } from 'lucide-react';
 import * as React from 'react';
-import { UploadCloud, File, Trash } from 'lucide-react';
 import { Button } from './custom-ui';
 
 interface UploadDropzoneProps {

@@ -1,9 +1,8 @@
-// components/sidebar/SidebarItem.tsx
 'use client';
 
-import * as React from 'react';
-import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
+import * as React from 'react';
 
 interface SidebarItemProps {
   icon: React.ReactNode;

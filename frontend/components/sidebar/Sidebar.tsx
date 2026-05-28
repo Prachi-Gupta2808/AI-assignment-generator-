@@ -1,24 +1,21 @@
-// components/sidebar/Sidebar.tsx
 'use client';
 
-import * as React from 'react';
-import { usePathname, useRouter } from 'next/navigation';
 import {
-  Home,
-  Users,
   BookOpen,
-  Sparkles,
+  Home,
   Library,
+  Plus,
   Settings,
-  Plus
+  Sparkles,
+  Users
 } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
 import { SidebarItem } from './SidebarItem';
 
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
 
-  // Navigation config with custom active matching logic
   const isHomeActive = pathname === '/' || pathname === '';
   const isGroupsActive = pathname.startsWith('/groups');
   const isAssignmentsActive = pathname.startsWith('/assignments') && !pathname.includes('/toolkit');
@@ -27,7 +24,6 @@ export function Sidebar() {
 
   return (
     <aside className="w-72 hidden lg:flex flex-col bg-white p-5 border border-neutral-200/80 rounded-3xl h-[calc(100vh-2rem)] shadow-sm select-none shrink-0">
-      {/* VedaAI Logo Header */}
       <div className="flex items-center gap-2 px-2 py-1 mb-6 cursor-pointer select-none" onClick={() => router.push('/')}>
         <svg
           viewBox="0 0 512 512"
@@ -60,7 +56,6 @@ export function Sidebar() {
         </span>
       </div>
 
-      {/* Glowing CTA Button */}
       <button
         onClick={() => router.push('/assignments/create')}
         className="w-full bg-black text-white hover:bg-neutral-800 rounded-full py-3.5 px-5 flex items-center justify-center gap-2 font-semibold text-sm transition-all duration-300 shadow-[0_0_14px_rgba(255,106,43,0.35)] border border-[#FF6A2B]/40 hover:shadow-[0_0_18px_rgba(255,106,43,0.5)] cursor-pointer active:scale-98 mb-6"
@@ -71,7 +66,6 @@ export function Sidebar() {
         <span>Create Assignment</span>
       </button>
 
-      {/* Main Navigation Stack */}
       <nav className="flex-1 flex flex-col gap-1.5 overflow-y-auto">
         <SidebarItem
           icon={<Home size={18} />}
@@ -95,7 +89,7 @@ export function Sidebar() {
         <SidebarItem
           icon={<Sparkles size={18} />}
           label="AI Teacher's Toolkit"
-          href="/assignments/create" // Links to creation/toolkit
+          href="/assignments/create" 
           isActive={isToolkitActive}
         />
         <SidebarItem
@@ -107,7 +101,6 @@ export function Sidebar() {
         />
       </nav>
 
-      {/* Footer Settings & School Profile */}
       <div className="border-t border-neutral-100 pt-4 flex flex-col gap-4 mt-auto">
         <SidebarItem
           icon={<Settings size={18} />}

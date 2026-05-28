@@ -1,7 +1,5 @@
-// components/ui/CounterInput.tsx
 'use client';
 
-import * as React from 'react';
 import { Minus, Plus } from 'lucide-react';
 
 interface CounterInputProps {

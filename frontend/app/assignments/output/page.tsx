@@ -1,12 +1,11 @@
-// app/assignments/output/page.tsx
 'use client';
 
-import * as React from 'react';
-import { useRouter } from 'next/navigation';
-import { Download, ArrowLeft, CheckCircle } from 'lucide-react';
 import { AssignmentPreview } from '@/components/assignments/AssignmentPreview';
 import { Button } from '@/components/ui/custom-ui';
 import { mockAcademicAssignment } from '@/data/mockData';
+import { ArrowLeft, CheckCircle, Download } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import * as React from 'react';
 
 const mockPaper = {
   schoolName: mockAcademicAssignment.schoolName,
@@ -44,7 +43,6 @@ export default function AssignmentOutputPage() {
 
   return (
     <div className="flex flex-col gap-6 select-none relative min-h-[calc(100vh-10rem)] pb-12">
-      {/* 1. Page Header Navigation */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
@@ -58,7 +56,6 @@ export default function AssignmentOutputPage() {
           </p>
         </div>
 
-        {/* Previous step arrow */}
         <Button
           type="button"
           variant="outline"
@@ -69,8 +66,6 @@ export default function AssignmentOutputPage() {
           <span>Edit Details</span>
         </Button>
       </div>
-
-      {/* 2. Top Black AI Response Banner with Download CTA */}
       <div className="bg-black text-white rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shadow-lg border border-neutral-800 select-text">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1.5">
@@ -100,13 +95,10 @@ export default function AssignmentOutputPage() {
           <span>{downloading ? 'Downloading...' : 'Download as PDF'}</span>
         </button>
       </div>
-
-      {/* 3. Printable A4 Document Preview Container (Fully responsive scrollable envelope) */}
       <div className="bg-neutral-200/50 rounded-2xl p-4 lg:p-6 border border-neutral-300/40 shadow-inner overflow-hidden">
         <AssignmentPreview paper={mockPaper} />
       </div>
 
-      {/* 4. Complete Action Footer */}
       <div className="flex justify-end gap-3 select-none">
         <Button
           type="button"

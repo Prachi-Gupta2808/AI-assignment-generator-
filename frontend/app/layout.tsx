@@ -1,10 +1,8 @@
-// app/layout.tsx
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import './globals.css';
 
-// Configure the Inter font as the primary font family
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
@@ -17,7 +15,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: '/favicon.ico',
+        url: '/icon.png',
       },
     ],
   },

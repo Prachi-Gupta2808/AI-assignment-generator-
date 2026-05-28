@@ -1,17 +1,14 @@
-// components/navbar/TopNavbar.tsx
 'use client';
 
-import * as React from 'react';
-import { useRouter, usePathname } from 'next/navigation';
 import { ArrowLeft, Bell, ChevronDown, LayoutGrid } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { usePathname, useRouter } from 'next/navigation';
+import * as React from 'react';
 
 export function TopNavbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
 
-  // Dynamic breadcrumbs based on pathname
   const getBreadcrumbs = () => {
     if (pathname.includes('/output')) return 'Create New';
     if (pathname.includes('/create')) return 'Assignment';
@@ -31,7 +28,7 @@ export function TopNavbar() {
 
   return (
     <header className="bg-white rounded-2xl px-5 py-3.5 flex items-center justify-between border border-neutral-200/80 shadow-sm w-full select-none">
-      {/* Breadcrumb section with Back Arrow */}
+
       <div className="flex items-center gap-4">
         <button
           onClick={handleBack}
@@ -46,18 +43,13 @@ export function TopNavbar() {
         </div>
       </div>
 
-      {/* Notifications and Profile */}
       <div className="flex items-center gap-4">
-        {/* Bell with orange dot */}
         <button className="relative w-9 h-9 rounded-full border border-neutral-200 flex items-center justify-center text-neutral-600 hover:bg-neutral-50 active:scale-95 transition-all cursor-pointer">
           <Bell size={18} />
           <span className="absolute top-2 right-2.5 w-2 h-2 rounded-full bg-[#FF6A2B] border border-white" />
         </button>
-
-        {/* Divider */}
         <div className="w-[1px] h-6 bg-neutral-200" />
 
-        {/* User avatar dropdown */}
         <div className="relative">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}

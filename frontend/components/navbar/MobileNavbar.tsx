@@ -1,21 +1,20 @@
-// components/navbar/MobileNavbar.tsx
 'use client';
 
-import * as React from 'react';
-import { useRouter as useNextRouter, usePathname as useNextPathname } from 'next/navigation';
-import {
-  Home,
-  BookOpen,
-  Library,
-  Sparkles,
-  Menu,
-  Bell,
-  X,
-  Plus,
-  Users,
-  Settings
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  Bell,
+  BookOpen,
+  Home,
+  Library,
+  Menu,
+  Plus,
+  Settings,
+  Sparkles,
+  Users,
+  X
+} from 'lucide-react';
+import { usePathname as useNextPathname, useRouter as useNextRouter } from 'next/navigation';
+import * as React from 'react';
 
 export function MobileNavbar() {
   const router = useNextRouter();
@@ -35,9 +34,8 @@ export function MobileNavbar() {
 
   return (
     <>
-      {/* 1. MOBILE TOPBAR (Header) */}
       <header className="lg:hidden w-full bg-white border border-neutral-200/80 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm select-none">
-        {/* VedaAI Logo */}
+
         <div className="flex items-center gap-2 select-none" onClick={() => router.push('/')}>
           <svg
             viewBox="0 0 512 512"
@@ -70,20 +68,14 @@ export function MobileNavbar() {
           </span>
         </div>
 
-        {/* Action icons on right */}
         <div className="flex items-center gap-3">
-          {/* Bell with orange dot */}
           <button className="relative w-8 h-8 rounded-full border border-neutral-100 flex items-center justify-center text-neutral-600 active:scale-95 transition-all">
             <Bell size={15} />
             <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#FF6A2B] border border-white" />
           </button>
-
-          {/* User profile avatar */}
           <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center overflow-hidden border border-neutral-200">
             <span className="text-xs font-bold text-neutral-700">JD</span>
           </div>
-
-          {/* Hamburger Menu Toggle */}
           <button
             onClick={() => setDrawerOpen(true)}
             className="w-8 h-8 rounded-full border border-neutral-200 flex items-center justify-center text-neutral-600 active:scale-95 transition-all"
@@ -93,7 +85,6 @@ export function MobileNavbar() {
         </div>
       </header>
 
-      {/* 2. DRAWER OVERLAY (Slide out navigation drawer) */}
       {drawerOpen && (
         <>
           <div
@@ -102,7 +93,6 @@ export function MobileNavbar() {
           />
           <div className="fixed top-0 right-0 bottom-0 w-72 max-w-full bg-white z-50 shadow-2xl p-6 flex flex-col justify-between animate-in slide-in-from-right duration-200">
             <div className="flex flex-col gap-6">
-              {/* Header inside drawer */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 select-none">
                   <svg
@@ -141,7 +131,7 @@ export function MobileNavbar() {
                 </button>
               </div>
 
-              {/* Sidebar CTA */}
+
               <button
                 onClick={() => {
                   setDrawerOpen(false);
@@ -155,7 +145,6 @@ export function MobileNavbar() {
                 <span>Create Assignment</span>
               </button>
 
-              {/* Navigation Items */}
               <nav className="flex flex-col gap-1.5">
                 {navItems.map((item) => {
                   const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
@@ -191,8 +180,6 @@ export function MobileNavbar() {
                 </button>
               </nav>
             </div>
-
-            {/* Bottom items inside drawer */}
             <div className="border-t border-neutral-100 pt-4 flex flex-col gap-4">
               <button
                 onClick={() => {
@@ -219,8 +206,6 @@ export function MobileNavbar() {
         </>
       )}
 
-      {/* 3. MOBILE FLOATING ACTION PLUS BUTTON */}
-      {/* Visible only if not currently in creation state */}
       {!pathname.includes('/create') && !pathname.includes('/output') && (
         <button
           onClick={handleCreateNew}
@@ -230,7 +215,6 @@ export function MobileNavbar() {
         </button>
       )}
 
-      {/* 4. MOBILE BOTTOM STICKY NAVIGATION BAR */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-neutral-100 px-4 py-2 select-none shadow-[0_-4px_16px_rgba(0,0,0,0.05)]">
         <div className="bg-black rounded-full max-w-md mx-auto px-6 py-2.5 flex justify-between items-center shadow-lg border border-neutral-800">
           {navItems.map((item) => {

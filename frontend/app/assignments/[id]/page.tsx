@@ -367,14 +367,6 @@ export default function AssignmentDetailPage({ params }: { params: Promise<{ id:
       </div>
       <div className="bg-black text-white rounded-2xl p-6 flex flex-col items-start gap-4 shadow-lg border border-neutral-800 select-text">
         <div className="w-full">
-          <div className="flex items-center gap-2 mb-1.5 select-none">
-            <div className="w-5 h-5 rounded-md bg-[#FF6A2B] flex items-center justify-center text-white text-[10px] font-extrabold font-sans shrink-0">
-              V
-            </div>
-            <span className="text-[10px] font-bold text-[#FF6A2B] uppercase tracking-widest font-sans select-none">
-              VedaAI Generated Response
-            </span>
-          </div>
           
           <p className="text-xs sm:text-sm font-semibold leading-relaxed tracking-wide text-neutral-200">
             {paper.aiMessage || `Certainly, Lakshya! Here is a customized Question Paper for your CBSE Grade 5 Science classes on the NCERT chapters:`}
@@ -433,7 +425,7 @@ export default function AssignmentDetailPage({ params }: { params: Promise<{ id:
       {showToast && (
         <div className="fixed top-5 right-5 z-50 bg-[#10B981] text-white font-sans text-xs sm:text-sm font-bold py-3.5 px-6 rounded-2xl shadow-xl flex items-center gap-2 border border-emerald-400/20 animate-in fade-in slide-in-from-top-4 duration-300">
           <CheckCircle size={16} strokeWidth={2.5} />
-          <span>Assignment generated successfully! ⚡</span>
+          <span>Assignment generated successfully!</span>
         </div>
       )}
     </div>

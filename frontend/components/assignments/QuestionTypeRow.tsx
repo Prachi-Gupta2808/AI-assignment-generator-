@@ -1,9 +1,7 @@
-// components/assignments/QuestionTypeRow.tsx
 'use client';
 
-import * as React from 'react';
+import { QuestionTypeRowConfig } from '@/types';
 import { X } from 'lucide-react';
-import { QuestionTypeRowConfig, QuestionTypeSelection } from '@/types';
 import { CounterInput } from '../ui/CounterInput';
 import { Input } from '../ui/custom-ui';
 
@@ -17,7 +15,6 @@ export function QuestionTypeRow({ row, onChange, onRemove }: QuestionTypeRowProp
   return (
     <div className="relative w-full bg-white lg:bg-transparent rounded-2xl lg:rounded-none border border-neutral-200/50 lg:border-0 p-4 lg:p-0 flex flex-col lg:flex-row items-stretch lg:items-center gap-4 lg:gap-3 select-none">
       
-      {/* 1. Category Input field (Desktop & Mobile) */}
       <div className="flex-1 min-w-0 flex items-center gap-2">
         <div className="flex-1">
           <Input
@@ -29,8 +26,6 @@ export function QuestionTypeRow({ row, onChange, onRemove }: QuestionTypeRowProp
             required
           />
         </div>
-
-        {/* Remove Button for Mobile View (Placed next to dropdown) */}
         <button
           type="button"
           onClick={() => onRemove(row.id)}
@@ -40,7 +35,6 @@ export function QuestionTypeRow({ row, onChange, onRemove }: QuestionTypeRowProp
         </button>
       </div>
 
-      {/* Remove Button for Desktop View (Hidden on mobile) */}
       <button
         type="button"
         onClick={() => onRemove(row.id)}
@@ -49,10 +43,8 @@ export function QuestionTypeRow({ row, onChange, onRemove }: QuestionTypeRowProp
         <X size={14} strokeWidth={2.5} />
       </button>
 
-      {/* 2. Counter Steppers Container */}
       <div className="flex items-center justify-between gap-4 lg:gap-6 pt-3 lg:pt-0 border-t border-neutral-100 lg:border-0">
         
-        {/* No. of Questions Stepper */}
         <div className="flex flex-1 lg:flex-none flex-col lg:flex-row items-start lg:items-center gap-1.5 lg:gap-3">
           <span className="text-[10px] lg:hidden font-bold text-neutral-400 uppercase tracking-wide">
             No. of Questions
@@ -64,8 +56,6 @@ export function QuestionTypeRow({ row, onChange, onRemove }: QuestionTypeRowProp
             max={50}
           />
         </div>
-
-        {/* Marks Stepper */}
         <div className="flex flex-1 lg:flex-none flex-col lg:flex-row items-start lg:items-center gap-1.5 lg:gap-3">
           <span className="text-[10px] lg:hidden font-bold text-neutral-400 uppercase tracking-wide">
             Marks

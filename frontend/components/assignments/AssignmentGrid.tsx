@@ -1,7 +1,6 @@
-// components/assignments/AssignmentGrid.tsx
+
 'use client';
 
-import * as React from 'react';
 import { Assignment } from '@/types';
 import { AssignmentCard } from './AssignmentCard';
 

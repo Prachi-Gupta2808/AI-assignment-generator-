@@ -1,11 +1,9 @@
-// components/assignments/AssignmentCard.tsx
 'use client';
 
-import * as React from 'react';
-import { useRouter } from 'next/navigation';
-import { MoreVertical, Eye, Trash2 } from 'lucide-react';
 import { Assignment } from '@/types';
-import { cn } from '@/lib/utils';
+import { Eye, MoreVertical, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import * as React from 'react';
 
 interface AssignmentCardProps {
   assignment: Assignment;
@@ -40,13 +38,12 @@ export function AssignmentCard({ assignment, onDelete }: AssignmentCardProps) {
 
   return (
     <div className="relative bg-white rounded-2xl p-5 border border-neutral-200/60 shadow-[0_4px_16px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.04)] hover:border-neutral-300/80 transition-all duration-200 flex flex-col justify-between select-none">
-      {/* Upper Section: Title and Menu Button */}
+  
       <div className="flex items-start justify-between gap-4 mb-5">
         <h3 className="text-base font-bold text-neutral-800 tracking-tight leading-snug">
           {assignment.title}
         </h3>
         
-        {/* Three dot actions dropdown */}
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -77,7 +74,6 @@ export function AssignmentCard({ assignment, onDelete }: AssignmentCardProps) {
         </div>
       </div>
 
-      {/* Bottom Section: Assigned & Due dates */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-neutral-50 pt-4 text-xs font-medium text-neutral-400">
         <div>
           <span>Assigned on : </span>

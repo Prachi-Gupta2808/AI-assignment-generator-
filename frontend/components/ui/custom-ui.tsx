@@ -1,6 +1,5 @@
-// components/ui/custom-ui.tsx
-import * as React from 'react';
 import { cn } from '@/lib/utils';
+import * as React from 'react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'ghost';
