@@ -14,6 +14,16 @@ export const initWebSocket = (server: Server) => {
   wss.on("connection", (ws: WebSocket) => {
     console.log("New WebSocket connection!");
 
+    const pingInterval = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.ping();
+      }
+    }, 30000);
+
+    ws.on("pong", () => {
+      console.log("Client ponged");
+    });
+
     ws.on("message", (message: string) => {
       try {
         const data = JSON.parse(message.toString());
@@ -27,11 +37,13 @@ export const initWebSocket = (server: Server) => {
     });
 
     ws.on("close", () => {
+      clearInterval(pingInterval);
       clients = clients.filter((c) => c.ws !== ws);
       console.log("Client disconnected");
     });
 
     ws.on("error", (err) => {
+      clearInterval(pingInterval);
       console.error("WebSocket error:", err);
       clients = clients.filter((c) => c.ws !== ws);
     });

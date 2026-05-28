@@ -89,16 +89,14 @@ export default function AssignmentDetailPage({ params }: { params: Promise<{ id:
     }
   };
 
-  const connectWebSocket = () => {
-    const ws = new WebSocket(
-      `${process.env.NEXT_PUBLIC_WS_URL}/ws`
-    );
-      
-    
+  const connectWebSocket = (retryCount = 0) => {
+    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL}/ws`);
+  
     ws.onopen = () => {
+      console.log("WebSocket connected!");
       ws.send(JSON.stringify({ assignmentId: id }));
     };
-    
+  
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
@@ -116,12 +114,18 @@ export default function AssignmentDetailPage({ params }: { params: Promise<{ id:
         console.error('Error parsing WS message:', e);
       }
     };
-    
+  
+    ws.onclose = () => {
+      console.log("WebSocket connection closed.");
+      if (retryCount < 3) {
+        console.log(`Reconnecting... attempt ${retryCount + 1}`);
+        setTimeout(() => connectWebSocket(retryCount + 1), 3000);
+      }
+    };
+  
     ws.onerror = (err) => {
       console.error('WebSocket error:', err);
       ws.close();
-      setStatus('failed');
-      setErrorMsg('WebSocket connection error.');
     };
   };
 
