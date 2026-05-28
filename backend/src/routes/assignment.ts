@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = ["image/jpeg", "image/png", "application/pdf"];
     if (allowed.includes(file.mimetype)) {
@@ -34,7 +34,23 @@ const upload = multer({
 // GET all assignments
 router.get("/", async (req: Request, res: Response) => {
   try {
+    const cachedList = await redisClient.get("assignments:list");
+    if (cachedList) {
+      res.json({
+        success: true,
+        data: JSON.parse(cachedList),
+        fromCache: true,
+      });
+      return;
+    }
+
     const assignments = await Assignment.find().sort({ createdAt: -1 });
+    await redisClient.set(
+      "assignments:list",
+      JSON.stringify(assignments),
+      "EX",
+      3600
+    );
     res.json({ success: true, data: assignments });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
@@ -44,11 +60,30 @@ router.get("/", async (req: Request, res: Response) => {
 // GET single assignment
 router.get("/:id", async (req: Request, res: Response) => {
   try {
+    const cachedMeta = await redisClient.get(
+      `assignment:meta:${req.params.id}`
+    );
+    if (cachedMeta) {
+      res.json({
+        success: true,
+        data: JSON.parse(cachedMeta),
+        fromCache: true,
+      });
+      return;
+    }
+
     const assignment = await Assignment.findById(req.params.id);
     if (!assignment) {
       res.status(404).json({ success: false, message: "Not found" });
       return;
     }
+
+    await redisClient.set(
+      `assignment:meta:${req.params.id}`,
+      JSON.stringify(assignment),
+      "EX",
+      86400
+    );
     res.json({ success: true, data: assignment });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
@@ -67,13 +102,11 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
       return;
     }
 
-    // Parse questionTypes if it's a string
     const parsedQuestionTypes =
       typeof questionTypes === "string"
         ? JSON.parse(questionTypes)
         : questionTypes;
 
-    // Extract text from file if uploaded
     let extractedText = "";
     if (req.file) {
       extractedText = await extractTextFromFile(
@@ -95,6 +128,9 @@ router.post("/", upload.single("file"), async (req: Request, res: Response) => {
       assignmentId: assignment!._id.toString(),
     });
 
+    // Invalidate assignments list cache
+    await redisClient.del("assignments:list");
+
     res.status(201).json({ success: true, data: assignment });
   } catch (error) {
     console.error(error);
@@ -107,7 +143,11 @@ router.delete("/:id", async (req: Request, res: Response) => {
   try {
     await Assignment.findByIdAndDelete(req.params.id);
     await GeneratedPaper.findOneAndDelete({ assignmentId: req.params.id });
+
     await redisClient.del(`paper:${req.params.id}`);
+    await redisClient.del(`assignment:meta:${req.params.id}`);
+    await redisClient.del("assignments:list");
+
     res.json({ success: true, message: "Deleted successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
@@ -148,7 +188,10 @@ router.get("/:id/paper", async (req: Request, res: Response) => {
 router.post("/:id/regenerate", async (req: Request, res: Response) => {
   try {
     await GeneratedPaper.findOneAndDelete({ assignmentId: req.params.id });
+
     await redisClient.del(`paper:${req.params.id}`);
+    await redisClient.del(`assignment:meta:${req.params.id}`);
+    await redisClient.del("assignments:list");
 
     await Assignment.findByIdAndUpdate(req.params.id, {
       status: "pending",
