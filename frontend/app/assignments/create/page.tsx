@@ -173,10 +173,7 @@ export default function CreateAssignmentPage() {
         
         setGenerationMessage('Connecting to generator...');
         
-        const wsHost = typeof window !== 'undefined' 
-          ? `ws://${window.location.hostname}:5000` 
-          : 'ws://localhost:5000';
-        const ws = new WebSocket(wsHost);
+        const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL}/ws`);
         
         let finished = false;
         
